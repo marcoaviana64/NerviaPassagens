@@ -53,7 +53,7 @@ export async function searchTravelpayoutsOffers(params: FlightSearchParams): Pro
     direct: "false",
     unique: "false",
     sorting: "price",
-    cy: "brl",
+    currency: "brl",
     limit: "30",
     page: "1",
   });
