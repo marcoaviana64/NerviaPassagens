@@ -45,19 +45,28 @@ export async function searchTravelpayoutsOffers(params: FlightSearchParams): Pro
   const token = process.env.TRAVELPAYOUTS_TOKEN;
   if (!token) throw new Error("TRAVELPAYOUTS_NOT_CONFIGURED");
 
+  // A Data API casa preços com o cache de buscas de outros usuários dos últimos 2-7 dias.
+  // Exigir o dia exato de ida/volta praticamente nunca bate com esse cache (confirmado em
+  // testes reais, inclusive em rotas populares como GRU-MIA). Por isso a busca usa o MÊS
+  // (YYYY-MM, formato aceito pela API) em vez do dia exato — isso amplia bastante a chance
+  // de encontrar preços reais. As ofertas retornadas trazem suas próprias datas reais
+  // dentro desse mês, que podem não ser exatamente as datas escolhidas pelo usuário.
+  const departMonth = params.departDate.slice(0, 7);
+  const returnMonth = params.returnDate ? params.returnDate.slice(0, 7) : undefined;
+
   const query = new URLSearchParams({
     origin: params.origin,
     destination: params.destination,
-    departure_at: params.departDate,
+    departure_at: departMonth,
     one_way: params.returnDate ? "false" : "true",
     direct: "false",
     unique: "false",
     sorting: "price",
-    cy: "brl",
+    currency: "brl",
     limit: "30",
     page: "1",
   });
-  if (params.returnDate) query.set("return_at", params.returnDate);
+  if (returnMonth) query.set("return_at", returnMonth);
 
   const res = await fetch(`${BASE_URL}?${query.toString()}`, {
     headers: { "X-Access-Token": token },
