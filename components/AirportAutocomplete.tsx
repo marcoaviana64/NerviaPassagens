@@ -97,7 +97,8 @@ export function AirportAutocomplete({ label, placeholder, value, onChange, icon 
             >
               <span>
                 <span className="block font-medium text-slate-900">
-                  {airport.city}, {airport.country}
+                  {airport.city}
+                  {airport.region ? `, ${airport.region}` : ""}, {airport.country}
                 </span>
                 <span className="block text-xs text-slate-500">{airport.name}</span>
               </span>
